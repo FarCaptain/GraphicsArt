@@ -41,16 +41,22 @@ void sendDataToOpenGL()
 {
 	GLfloat verts[] =
 	{
-		+0.0f, +0.0f,
+		-1.0f, -1.0f,
 		+1.0f, +0.0f, +0.0f,
 
-		+0.5f, +0.0f,
-		+1.0f, +1.0f, +0.0f,
+		-0.5f, +0.0f,
+		+1.0f, +0.0f, +0.0f,
 
-		+0.5f, +0.5f,
-		+1.0f, +0.0f, +1.0f,
+		+0.0f, -1.0f,
+		+1.0f, +0.0f, +0.0f,
 
-		+0.0f, +1.0f,
+		+0.3f, -1.0f,
+		+0.0f, +0.0f, +1.0f,
+
+		+0.5f, -0.5f,
+		+0.0f, +0.0f, +1.0f,
+
+		+0.7f, -1.0f,
 		+0.0f, +0.0f, +1.0f,
 	};
 	GLuint myBufferID;
@@ -58,12 +64,14 @@ void sendDataToOpenGL()
 	glBindBuffer(GL_ARRAY_BUFFER, myBufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts),
 		verts, GL_STATIC_DRAW);
+	// position
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+	// color
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (char*)(sizeof(float) * 2));
 
-	GLushort indices[] = { 0,1,2,0,2,3 };
+	GLushort indices[] = { 0,1,2,3,4,5 };
 	GLuint indexBufferID;
 	glGenBuffers(1, &indexBufferID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
