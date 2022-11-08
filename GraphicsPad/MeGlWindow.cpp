@@ -131,6 +131,19 @@ void MeGlWindow::installShaders()
 
 void MeGlWindow::initializeGL()
 {
+	offset1.x = 0.5f;
+	offset1.y = 0.0f;
+	offset2.x = -0.3f;
+	offset2.y = 0.0f;
+
+	v1.x = 0.1f;
+	v1.y = 0.0f;
+	v2.x = 0.0f;
+	v2.y = 0.0f;
+
+	speed1 = 0.6;
+	speed2 = 0.6;
+
 	glewInit();
 	sendDataToOpenGL();
 	installShaders();
@@ -138,7 +151,7 @@ void MeGlWindow::initializeGL()
 
 void MeGlWindow::paintGL()
 {
-	deltaTime = 0.3f;
+	deltaTime = 0.2f;
 	offset1 = offset1 + v1 * deltaTime;
 	offset2 = offset2 + v2 * deltaTime;
 
@@ -149,21 +162,29 @@ void MeGlWindow::paintGL()
 	// levelart
 	glUniform3f(colorId, 0.1f, 0.3f, 0.1f);
 	glUniform2f(scaleId, 1.0f, 1.0f);
-	glUniform2f(offsetId, 0.5f, 0.0f);
+	glUniform2f(offsetId, 0.0f, 0.0f);
 
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7 + sizeof(GLshort) * 3));
 
 	// Player 1
 	glUniform3f(colorId, 1.0f, 0.0f, 0.0f);
-	glUniform2f(scaleId, 2, 2);
+	glUniform2f(scaleId, 1, 1);
 	glUniform2f(offsetId, offset1.x, offset1.y);
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7));
 
 	// Player 2
 	glUniform3f(colorId, 0, 0, 1);
-	glUniform2f(scaleId, 1, 1);
+	glUniform2f(scaleId, 0.5, 0.3);
 	glUniform2f(offsetId, offset2.x, offset2.y);
 	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7));
+}
+
+void MeGlWindow::keyPressEvent(QKeyEvent* event) {
+	handleInput(event, true);
+}
+
+void MeGlWindow::keyReleaseEvent(QKeyEvent* event) {
+	handleInput(event, false);
 }
 
 void MeGlWindow::handleInput(QKeyEvent* event, bool pressed)

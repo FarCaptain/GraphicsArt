@@ -9,6 +9,9 @@ class MeGlWindow : public QGLWidget
 protected:
 	void initializeGL();
 	void paintGL();
+	virtual void keyPressEvent(QKeyEvent*) override; // Function defined in QWidget
+	virtual void keyReleaseEvent(QKeyEvent*) override; // Function defined in QWidget
+
 	void handleInput(QKeyEvent* event, bool pressed);
 
 private:
