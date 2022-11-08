@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <MeGlWindow.h>
+#include <ShaderLoader.h>
 using namespace std;
 
 bool checkStatus(
@@ -41,42 +42,45 @@ void sendDataToOpenGL()
 {
 	GLfloat verts[] =
 	{
-		-1.0f, -1.0f,
-		+1.0f, +0.0f, +0.0f,
-
-		-0.5f, +0.0f,
-		+1.0f, +0.0f, +0.0f,
-
-		+0.0f, -1.0f,
-		+1.0f, +0.0f, +0.0f,
-
-		+0.3f, -1.0f,
+		+0.2f, -0.5f,
 		+0.0f, +0.0f, +1.0f,
 
-		+0.5f, -0.5f,
+		+0.0f, +0.0f,
 		+0.0f, +0.0f, +1.0f,
 
-		+0.7f, -1.0f,
+		-0.2f, -0.5f,
 		+0.0f, +0.0f, +1.0f,
+
+
+		+0.8f, -1.0f,
+		+0.1f, +0.2f, +0.1f,
+		+0.8f, +1.0f,
+		+0.1f, +0.2f, +0.1f,
+		+1.0f, +1.0f,
+		+0.1f, +0.2f, +0.1f,
+		+1.0f, -1.0f,
+		+0.1f, +0.2f, +0.1f,
 	};
+
+	GLushort indices[] = { 0,1,2, 3,4,5,6 };
+
+
 	GLuint myBufferID;
 	glGenBuffers(1, &myBufferID);
+	// both buffers?
 	glBindBuffer(GL_ARRAY_BUFFER, myBufferID);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verts),
-		verts, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, myBufferID);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 7 + sizeof(indices), NULL, GL_STATIC_DRAW);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(verts), verts);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Vertex) * 7, sizeof(indices), indices);
+
 	// position
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
 	// color
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (char*)(sizeof(float) * 2));
-
-	GLushort indices[] = { 0,1,2,3,4,5 };
-	GLuint indexBufferID;
-	glGenBuffers(1, &indexBufferID);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices),
-		indices, GL_STATIC_DRAW);
 }
 
 string readShaderCode(const char* fileName)
@@ -92,32 +96,35 @@ string readShaderCode(const char* fileName)
 		std::istreambuf_iterator<char>());
 }
 
-void installShaders()
+void MeGlWindow::installShaders()
 {
 	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
 	const GLchar* adapter[1];
-	string temp = readShaderCode("VertexShaderCode.glsl");
-	adapter[0] = temp.c_str();
+	ShaderSource temp = GetShaderSource("shader.shader");
+	adapter[0] = temp.VertexSource.c_str();
 	glShaderSource(vertexShaderID, 1, adapter, 0);
-	temp = readShaderCode("FragmentShaderCode.glsl");
-	adapter[0] = temp.c_str();
+	adapter[0] = temp.FragmentSource.c_str();
 	glShaderSource(fragmentShaderID, 1, adapter, 0);
 
 	glCompileShader(vertexShaderID);
 	glCompileShader(fragmentShaderID);
 
-	if( ! checkShaderStatus(vertexShaderID) || ! checkShaderStatus(fragmentShaderID))
-		return;
+	//if( ! checkShaderStatus(vertexShaderID) || ! checkShaderStatus(fragmentShaderID))
+	//	return;
 
 	GLuint programID = glCreateProgram();
 	glAttachShader(programID, vertexShaderID);
 	glAttachShader(programID, fragmentShaderID);
 	glLinkProgram(programID);
 
-	if ( ! checkProgramStatus(programID))
-		return;
+	//if ( ! checkProgramStatus(programID))
+	//	return;
+
+	colorId = glGetUniformLocation(programID, "color");
+	scaleId = glGetUniformLocation(programID, "scale");
+	offsetId = glGetUniformLocation(programID, "offset");
 
 	glUseProgram(programID);
 }
@@ -131,7 +138,65 @@ void MeGlWindow::initializeGL()
 
 void MeGlWindow::paintGL()
 {
+	deltaTime = 0.3f;
+	offset1 = offset1 + v1 * deltaTime;
+	offset2 = offset2 + v2 * deltaTime;
+
 	glViewport(0, 0, width(), height());
-	//glDrawArrays(GL_TRIANGLES, 0, 6);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+	glClearColor(+0.9f, +0.8f, 0.8f, +1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// levelart
+	glUniform3f(colorId, 0.1f, 0.3f, 0.1f);
+	glUniform2f(scaleId, 1.0f, 1.0f);
+	glUniform2f(offsetId, 0.5f, 0.0f);
+
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7 + sizeof(GLshort) * 3));
+
+	// Player 1
+	glUniform3f(colorId, 1.0f, 0.0f, 0.0f);
+	glUniform2f(scaleId, 2, 2);
+	glUniform2f(offsetId, offset1.x, offset1.y);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7));
+
+	// Player 2
+	glUniform3f(colorId, 0, 0, 1);
+	glUniform2f(scaleId, 1, 1);
+	glUniform2f(offsetId, offset2.x, offset2.y);
+	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, (GLvoid*)(sizeof(Vertex) * 7));
+}
+
+void MeGlWindow::handleInput(QKeyEvent* event, bool pressed)
+{
+	float factor = pressed ? 1.0f : -0.0f;
+	float forceFactor = 500;
+
+	switch (event->key()) {
+	case Qt::Key::Key_W: // W
+		v1 = (Vector2{ 0, speed1 }*factor);
+		break;
+	case 0x0041: // A
+		v1 = (Vector2{ -speed1, 0.0f }*factor);
+		break;
+	case 0x0053: // S
+		v1 = (Vector2{ 0, -speed1 }*factor);
+		break;
+	case 0x0044: // D
+		v1 = (Vector2{ speed2, 0 }*factor);
+		break;
+	case Qt::Key::Key_Up: // W
+		v2 = (Vector2{ 0, speed2 }*factor);
+		break;
+	case Qt::Key::Key_Left: // A
+		v2 = (Vector2{ -speed2, 0.0f }*factor);
+		break;
+	case Qt::Key::Key_Down: // S
+		v2 = (Vector2{ 0, -speed2 }*factor);
+		break;
+	case Qt::Key::Key_Right: // D
+		v2 = (Vector2{ speed2, 0 }*factor);
+		break;
+	}
+	//std::cout << "{" << vel1.x << ", " << vel1.y << "}" << std::endl;
+	repaint();
 }
