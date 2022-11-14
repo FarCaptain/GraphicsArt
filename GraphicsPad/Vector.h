@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/glm.hpp>
 
 struct  Vector2
 {
@@ -16,4 +17,9 @@ struct Vector3
 struct Vertex {
 	Vector2 position;
 	Vector3 color;
+};
+
+struct Vertex3D {
+	glm::vec3 position;
+	glm::vec3 color;
 };
