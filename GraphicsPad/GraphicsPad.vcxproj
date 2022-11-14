@@ -149,13 +149,15 @@
     <ClCompile Include="Mainer.cpp" />
     <ClCompile Include="MeGlWindow.cpp" />
     <ClCompile Include="Primitives\ShapeGenerator.cpp" />
+    <ClCompile Include="ShaderLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FragmentShaderCode.glsl" />
+    <ClInclude Include="CubeShader.shader" />
     <ClInclude Include="MeGlWindow.h" />
     <ClInclude Include="Primitives\ShapeData.h" />
     <ClInclude Include="Primitives\Vertex.h" />
     <ClInclude Include="Primitives\ShapeGenerator.h" />
+    <ClInclude Include="ShaderLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VertexShaderCode.glsl" />

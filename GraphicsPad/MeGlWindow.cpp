@@ -3,15 +3,19 @@
 #include <fstream>
 #include <MeGlWindow.h>
 #include <glm\glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <Primitives\Vertex.h>
 #include <Primitives\ShapeGenerator.h>
+#include <ShaderLoader.h>
 using namespace std;
 using glm::vec3;
+using glm::mat4;
 
 const uint NUM_VERTICES_PER_TRI = 3;
 const uint NUM_FLOATS_PER_VERTICE = 6;
 const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 GLuint programID;
+GLuint numIndices;
 
 void sendDataToOpenGL()
 {
@@ -30,6 +34,7 @@ void sendDataToOpenGL()
 	glGenBuffers(1, &indexArrayBufferID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexArrayBufferID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, shape.indexBufferSize(), shape.indices, GL_STATIC_DRAW);
+	numIndices = shape.numIndices;
 	shape.cleanup();
 }
 
@@ -38,21 +43,31 @@ void MeGlWindow::paintGL()
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
 
-	GLint dominatingColorUniformLocation = 
-		glGetUniformLocation(programID, "dominatingColor");
-	GLint yFlipUniformLocation =
-		glGetUniformLocation(programID, "yFlip");
-	vec3 dominatingColor(1.0f, 0.0f, 0.0f);
+	mat4 Mt = glm::translate(mat4(), vec3(0.0f, 0.0f, -5.0f));
+	mat4 Mr = glm::rotate(mat4(), 54.0f, vec3(1.0f, 0.0f, 0.0f));
+	mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.f);
 
-	glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
-	glUniform1f(yFlipUniformLocation, 1.0f);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+	mat4 Mx = Mproj * Mt * Mr;
+	
+	GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
 
-	dominatingColor.r = 0;
-	dominatingColor.b = 1;
-	glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
-	glUniform1f(yFlipUniformLocation, -1.0f);
-	glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
+
+	//GLint dominatingColorUniformLocation = 
+	//	glGetUniformLocation(programID, "dominatingColor");
+	//GLint yFlipUniformLocation =
+	//	glGetUniformLocation(programID, "yFlip");
+	//vec3 dominatingColor(1.0f, 0.0f, 0.0f);
+
+	//glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
+	//glUniform1f(yFlipUniformLocation, 1.0f);
+	//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+
+	//dominatingColor.r = 0;
+	//dominatingColor.b = 1;
+	//glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
+	//glUniform1f(yFlipUniformLocation, -1.0f);
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
 }
 
 bool checkStatus(
@@ -106,12 +121,11 @@ void installShaders()
 	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
+	ShaderSource source = GetShaderSource("CubeShader.shader");
 	const GLchar* adapter[1];
-	string temp = readShaderCode("VertexShaderCode.glsl");
-	adapter[0] = temp.c_str();
+	adapter[0] = source.VertexSource.c_str();
 	glShaderSource(vertexShaderID, 1, adapter, 0);
-	temp = readShaderCode("FragmentShaderCode.glsl");
-	adapter[0] = temp.c_str();
+	adapter[0] = source.FragmentSource.c_str();
 	glShaderSource(fragmentShaderID, 1, adapter, 0);
 
 	glCompileShader(vertexShaderID);
