@@ -1,7 +1,16 @@
 #include <gl\glew.h>
+#include <ShaderLoader.h>
 #include <iostream>
-#include <fstream>
 #include <MeGlWindow.h>
+#include <QtGui\qmouseevent>
+#include <QtGui\qkeyevent>
+#include <MeGlWindow.h>
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+#include <glm\gtx\transform.hpp>
+#include <Primitives\Vertex.h>
+#include <Primitives\ShapeGenerator.h>
+#include <Camera.h>
 
 using namespace std;
 using glm::vec3;

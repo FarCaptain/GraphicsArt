@@ -1,5 +1,8 @@
 #pragma once
 #include "string"
+#include <fstream>
+#include <cassert>
+#include <sstream>
 
 struct ShaderSource {
 	std::string VertexSource;

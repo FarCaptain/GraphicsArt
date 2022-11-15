@@ -1,8 +1,4 @@
 #include "ShaderLoader.h"
-#include <fstream>
-#include <string>
-#include <cassert>
-#include <sstream>
 
 ShaderSource GetShaderSource(const char* fileName)
 {

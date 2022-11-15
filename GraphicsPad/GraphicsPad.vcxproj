@@ -146,12 +146,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Mainer.cpp" />
     <ClCompile Include="MeGlWindow.cpp" />
     <ClCompile Include="Primitives\ShapeGenerator.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeShader.shader" />
     <ClInclude Include="MeGlWindow.h" />
     <ClInclude Include="Primitives\ShapeData.h" />

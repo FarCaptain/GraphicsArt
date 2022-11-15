@@ -1,14 +1,9 @@
 #pragma once
 #ifndef ME_GL_WINDOW
 #define ME_GL_WINDOW
-#include <glm\glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <Primitives\Vertex.h>
-#include <Primitives\ShapeGenerator.h>
-#include <ShaderLoader.h>
+
 #include <QtOpenGL\qglwidget>
-#include <QtGui/qkeyevent>
-#include <Camera.h>
+
 
 class MeGlWindow : public QGLWidget
 {
