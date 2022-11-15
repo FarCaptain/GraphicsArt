@@ -23,8 +23,8 @@ const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 GLuint programID;
 GLuint numIndices;
 
-float vx = 3.0f;
-float vy = 2.0f;
+float vx = 1.5f;
+float vy = 1.0f;
 glm::lowp_float anglex = 54.0f;
 glm::lowp_float angley = 1.0f;
 Camera camera;
@@ -65,11 +65,14 @@ void MeGlWindow::paintGL()
 	mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.f);
 
 	mat4 Mx = Mproj * camera.getWorldToViewMatrix() * Mt * Mr;//Mproj * Mt * Mr;
+	vec3 offsets[5] = {vec3(1.0f, 1.0f, 1.0f), vec3(-2.0f, 0.0f, -1.0f), vec3(-0.5f, 2.0f, -3.0f), vec3(2.0f, -2.0f, -1.0f), vec3(2.0f, 2.0f, -4.0f)};
 	
 	GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
+	GLint offsetsLocation = glGetUniformLocation(programID, "offsets");
 
 	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
-	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+	glUniform3fv(offsetsLocation, 5, &offsets[0][0]);
+	glDrawElementsInstanced(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0, 5);
 	update();
 }
 

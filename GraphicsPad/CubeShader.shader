@@ -5,13 +5,14 @@ in layout(location = 0) vec3 position;
 in layout(location = 1) vec3 vertexColor;
 
 uniform mat4 transformMat;
+uniform vec3 offsets[5];
 
 out vec3 vecOutColor;
 
 void main()
 {
 	vec4 p = vec4(position, 1.0);
-	gl_Position = transformMat * p;
+	gl_Position = transformMat * p + vec4(offsets[gl_InstanceID],0.0);
 	vecOutColor = vertexColor;
 }
 
