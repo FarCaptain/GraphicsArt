@@ -28,7 +28,7 @@ float vy = 0;
 glm::lowp_float angle = 54.0f;
 Camera camera;
 
-void sendDataToOpenGL()
+void MeGlWindow::sendDataToOpenGL()
 {
 	ShapeData shape = ShapeGenerator::makeCube();
 
@@ -51,21 +51,22 @@ void sendDataToOpenGL()
 
 void MeGlWindow::paintGL()
 {
-	//glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	//glViewport(0, 0, width(), height());
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glViewport(0, 0, width(), height());
 
-	//mat4 Mt = glm::translate(mat4(), vec3(0.0f, 0.0f, -5.0f));
-	//angle += vx;
+	mat4 Mt = glm::translate(mat4(), vec3(0.0f, 0.0f, -5.0f));
+	angle += vx;
 
-	//mat4 Mr = glm::rotate(mat4(), angle, vec3(1.0f, 0.0f, 0.0f));
-	//mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.f);
+	mat4 Mr = glm::rotate(mat4(), angle, vec3(1.0f, 0.0f, 0.0f));
+	mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.f);
 
-	//mat4 Mx = Mproj * Mt * Mr;
-	//
-	//GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
+	mat4 Mx = Mproj * camera.getWorldToViewMatrix() * Mt * Mr;//Mproj * Mt * Mr;
+	
+	GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
 
-	//glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
-	//glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
+	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+	/*
 	mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.0f);
 	mat4 fullTransforms[] =
 	{
@@ -77,7 +78,7 @@ void MeGlWindow::paintGL()
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
 
-	glDrawElementsInstanced(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0, 2);
+	glDrawElementsInstanced(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0, 2);*/
 }
 
 bool checkStatus(
