@@ -2,11 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <MeGlWindow.h>
-#include <glm\glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <Primitives\Vertex.h>
-#include <Primitives\ShapeGenerator.h>
-#include <ShaderLoader.h>
+
 using namespace std;
 using glm::vec3;
 using glm::mat4;
@@ -16,6 +12,10 @@ const uint NUM_FLOATS_PER_VERTICE = 6;
 const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 GLuint programID;
 GLuint numIndices;
+
+float vx = 0;
+float vy = 0;
+glm::lowp_float angle = 54.0f;
 
 void sendDataToOpenGL()
 {
@@ -44,7 +44,9 @@ void MeGlWindow::paintGL()
 	glViewport(0, 0, width(), height());
 
 	mat4 Mt = glm::translate(mat4(), vec3(0.0f, 0.0f, -5.0f));
-	mat4 Mr = glm::rotate(mat4(), 54.0f, vec3(1.0f, 0.0f, 0.0f));
+	angle += vx;
+
+	mat4 Mr = glm::rotate(mat4(), angle, vec3(1.0f, 0.0f, 0.0f));
 	mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.f);
 
 	mat4 Mx = Mproj * Mt * Mr;
@@ -52,21 +54,6 @@ void MeGlWindow::paintGL()
 	GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
 
 	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
-
-	//GLint dominatingColorUniformLocation = 
-	//	glGetUniformLocation(programID, "dominatingColor");
-	//GLint yFlipUniformLocation =
-	//	glGetUniformLocation(programID, "yFlip");
-	//vec3 dominatingColor(1.0f, 0.0f, 0.0f);
-
-	//glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
-	//glUniform1f(yFlipUniformLocation, 1.0f);
-	//glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
-
-	//dominatingColor.r = 0;
-	//dominatingColor.b = 1;
-	//glUniform3fv(dominatingColorUniformLocation, 1, &dominatingColor[0]);
-	//glUniform1f(yFlipUniformLocation, -1.0f);
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
 }
 
@@ -151,4 +138,35 @@ void MeGlWindow::initializeGL()
 	glEnable(GL_DEPTH_TEST);
 	sendDataToOpenGL();
 	installShaders();
+}
+
+void MeGlWindow::keyPressEvent(QKeyEvent* event) {
+	handleInput(event, true);
+}
+
+void MeGlWindow::keyReleaseEvent(QKeyEvent* event) {
+	handleInput(event, false);
+}
+
+void MeGlWindow::handleInput(QKeyEvent* event, bool pressed)
+{
+	float speed = 5.0f;
+	float factor = pressed ? 1.0f : -0.0f;
+	float forceFactor = 500;
+
+	switch (event->key()) {
+	case Qt::Key::Key_W: // W
+		vy = speed * factor;
+		break;
+	case 0x0041: // A
+		vx = speed * factor;
+		break;
+	case 0x0053: // S
+		vy = speed * factor;
+		break;
+	case 0x0044: // D
+		vx = speed * factor;
+		break;
+		repaint();
+	}
 }
