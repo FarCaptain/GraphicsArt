@@ -6,6 +6,7 @@
 using namespace std;
 using glm::vec3;
 using glm::mat4;
+using glm::translate;
 
 const uint NUM_VERTICES_PER_TRI = 3;
 const uint NUM_FLOATS_PER_VERTICE = 6;
@@ -16,6 +17,7 @@ GLuint numIndices;
 float vx = 0;
 float vy = 0;
 glm::lowp_float angle = 54.0f;
+Camera camera;
 
 void sendDataToOpenGL()
 {
@@ -40,21 +42,33 @@ void sendDataToOpenGL()
 
 void MeGlWindow::paintGL()
 {
+	//glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	//glViewport(0, 0, width(), height());
+
+	//mat4 Mt = glm::translate(mat4(), vec3(0.0f, 0.0f, -5.0f));
+	//angle += vx;
+
+	//mat4 Mr = glm::rotate(mat4(), angle, vec3(1.0f, 0.0f, 0.0f));
+	//mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.f);
+
+	//mat4 Mx = Mproj * Mt * Mr;
+	//
+	//GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
+
+	//glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
+	//glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+	mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.0f);
+	mat4 fullTransforms[] =
+	{
+		projectionMatrix * camera.getWorldToViewMatrix() * glm::translate(vec3(-1.0f, 0.0f, -3.0f)) * glm::rotate(36.0f, vec3(1.0f, 0.0f, 0.0f)),
+		projectionMatrix * camera.getWorldToViewMatrix() * glm::translate(vec3(1.0f, 0.0f, -3.75f)) * glm::rotate(126.0f, vec3(0.0f, 1.0f, 0.0f))
+	};
+	glBufferData(GL_ARRAY_BUFFER, sizeof(fullTransforms), fullTransforms, GL_DYNAMIC_DRAW);
+
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
 
-	mat4 Mt = glm::translate(mat4(), vec3(0.0f, 0.0f, -5.0f));
-	angle += vx;
-
-	mat4 Mr = glm::rotate(mat4(), angle, vec3(1.0f, 0.0f, 0.0f));
-	mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.f);
-
-	mat4 Mx = Mproj * Mt * Mr;
-	
-	GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
-
-	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
-	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+	glDrawElementsInstanced(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0, 2);
 }
 
 bool checkStatus(
@@ -140,33 +154,34 @@ void MeGlWindow::initializeGL()
 	installShaders();
 }
 
-void MeGlWindow::keyPressEvent(QKeyEvent* event) {
-	handleInput(event, true);
-}
-
-void MeGlWindow::keyReleaseEvent(QKeyEvent* event) {
-	handleInput(event, false);
-}
-
-void MeGlWindow::handleInput(QKeyEvent* event, bool pressed)
+void MeGlWindow::mouseMoveEvent(QMouseEvent* e)
 {
-	float speed = 5.0f;
-	float factor = pressed ? 1.0f : -0.0f;
-	float forceFactor = 500;
+	camera.mouseUpdate(glm::vec2(e->x(), e->y()));
+	repaint();
+}
 
-	switch (event->key()) {
-	case Qt::Key::Key_W: // W
-		vy = speed * factor;
+void MeGlWindow::keyPressEvent(QKeyEvent* e)
+{
+	switch (e->key())
+	{
+	case Qt::Key::Key_W:
+		camera.moveForward();
 		break;
-	case 0x0041: // A
-		vx = speed * factor;
+	case Qt::Key::Key_S:
+		camera.moveBackward();
 		break;
-	case 0x0053: // S
-		vy = speed * factor;
+	case Qt::Key::Key_A:
+		camera.strafeLeft();
 		break;
-	case 0x0044: // D
-		vx = speed * factor;
+	case Qt::Key::Key_D:
+		camera.strafeRight();
 		break;
-		repaint();
+	case Qt::Key::Key_R:
+		camera.moveUp();
+		break;
+	case Qt::Key::Key_F:
+		camera.moveDown();
+		break;
 	}
+	repaint();
 }
