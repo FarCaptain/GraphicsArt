@@ -23,9 +23,10 @@ const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 GLuint programID;
 GLuint numIndices;
 
-float vx = 0;
-float vy = 0;
-glm::lowp_float angle = 54.0f;
+float vx = 3.0f;
+float vy = 2.0f;
+glm::lowp_float anglex = 54.0f;
+glm::lowp_float angley = 1.0f;
 Camera camera;
 
 void MeGlWindow::sendDataToOpenGL()
@@ -55,9 +56,12 @@ void MeGlWindow::paintGL()
 	glViewport(0, 0, width(), height());
 
 	mat4 Mt = glm::translate(mat4(), vec3(0.0f, 0.0f, -5.0f));
-	angle += vx;
+	anglex += vx;
+	angley += vy;
 
-	mat4 Mr = glm::rotate(mat4(), angle, vec3(1.0f, 0.0f, 0.0f));
+	mat4 Mr = glm::rotate(mat4(), anglex, vec3(1.0f, 0.0f, 0.0f));
+	mat4 Mr2 = glm::rotate(mat4(), angley, vec3(0.0f, 1.0f, 0.0f));
+	Mr = Mr2 * Mr;
 	mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.f);
 
 	mat4 Mx = Mproj * camera.getWorldToViewMatrix() * Mt * Mr;//Mproj * Mt * Mr;
@@ -66,19 +70,7 @@ void MeGlWindow::paintGL()
 
 	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
-	/*
-	mat4 projectionMatrix = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 10.0f);
-	mat4 fullTransforms[] =
-	{
-		projectionMatrix * camera.getWorldToViewMatrix() * glm::translate(vec3(-1.0f, 0.0f, -3.0f)) * glm::rotate(36.0f, vec3(1.0f, 0.0f, 0.0f)),
-		projectionMatrix * camera.getWorldToViewMatrix() * glm::translate(vec3(1.0f, 0.0f, -3.75f)) * glm::rotate(126.0f, vec3(0.0f, 1.0f, 0.0f))
-	};
-	glBufferData(GL_ARRAY_BUFFER, sizeof(fullTransforms), fullTransforms, GL_DYNAMIC_DRAW);
-
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	glViewport(0, 0, width(), height());
-
-	glDrawElementsInstanced(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0, 2);*/
+	update();
 }
 
 bool checkStatus(
