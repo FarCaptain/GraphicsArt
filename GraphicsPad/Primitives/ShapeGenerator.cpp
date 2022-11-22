@@ -4,6 +4,15 @@
 using glm::vec3;
 #define NUM_ARRAY_ELEMENTS(a) sizeof(a) / sizeof(*a)
 
+glm::vec3 randomColor()
+{
+	glm::vec3 ret;
+	ret.x = rand() / (float)RAND_MAX;
+	ret.y = rand() / (float)RAND_MAX;
+	ret.z = rand() / (float)RAND_MAX;
+	return ret;
+}
+
 ShapeData ShapeGenerator::makeTriangle()
 {
 	ShapeData ret;
@@ -12,11 +21,14 @@ ShapeData ShapeGenerator::makeTriangle()
 	{
 		glm::vec3(+0.0f, +1.0f, +0.0f),
 		glm::vec3(+1.0f, +0.0f, +0.0f),
+		glm::vec3(+0.0f, +0.0f, +1.0f),
 
 		glm::vec3(-1.0f, -1.0f, +0.0f),
 		glm::vec3(+0.0f, +1.0f, +0.0f),
+		glm::vec3(+0.0f, +0.0f, +1.0f),
 
 		glm::vec3(+1.0f, -1.0f, +0.0f),
+		glm::vec3(+0.0f, +0.0f, +1.0f),
 		glm::vec3(+0.0f, +0.0f, +1.0f),
 	};
 	ret.numVertices = NUM_ARRAY_ELEMENTS(myTri);
@@ -33,60 +45,85 @@ ShapeData ShapeGenerator::makeTriangle()
 
 ShapeData ShapeGenerator::makeCube() {
 	ShapeData ret;
-	Vertex stackVerts[] = {
-		vec3(-1.0f, +1.0f, +1.0f), // 0
-		vec3(+1.0f, +0.0f, +0.0f), // Color
-		vec3(+1.0f, +1.0f, +1.0f), // 1
-		vec3(+0.0f, +1.0f, +0.0f), // Color
-		vec3(+1.0f, +1.0f, -1.0f), // 2
-		vec3(+0.0f, +0.0f, +1.0f), // Color
-		vec3(-1.0f, +1.0f, -1.0f), // 3
-		vec3(+1.0f, +1.0f, +1.0f), // Color
+	Vertex stackVerts[] =
+	{
+		vec3(-1.0f, +1.0f, +1.0f),  // 0
+		vec3(+1.0f, +0.0f, +0.0f),	// Color
+		vec3(+0.0f, +1.0f, +0.0f),  // Normal
+		vec3(+1.0f, +1.0f, +1.0f),  // 1
+		vec3(+0.0f, +1.0f, +0.0f),	// Color
+		vec3(+0.0f, +1.0f, +0.0f),  // Normal
+		vec3(+1.0f, +1.0f, -1.0f),  // 2
+		vec3(+0.0f, +0.0f, +1.0f),  // Color
+		vec3(+0.0f, +1.0f, +0.0f),  // Normal
+		vec3(-1.0f, +1.0f, -1.0f),  // 3
+		vec3(+1.0f, +1.0f, +1.0f),  // Color
+		vec3(+0.0f, +1.0f, +0.0f),  // Normal
 
-		vec3(-1.0f, +1.0f, -1.0f), // 4
-		vec3(+1.0f, +0.0f, +1.0f), // Color
-		vec3(+1.0f, +1.0f, -1.0f), // 5
-		vec3(+0.0f, +0.5f, +0.2f), // Color
-		vec3(+1.0f, -1.0f, -1.0f), // 6
-		vec3(+0.8f, +0.6f, +0.4f), // Color
-		vec3(-1.0f, -1.0f, -1.0f), // 7
-		vec3(+0.3f, +1.0f, +0.5f), // Color
+		vec3(-1.0f, +1.0f, -1.0f),  // 4
+		vec3(+1.0f, +0.0f, +1.0f),  // Color
+		vec3(+0.0f, +0.0f, -1.0f),  // Normal
+		vec3(+1.0f, +1.0f, -1.0f),  // 5
+		vec3(+0.0f, +0.5f, +0.2f),  // Color
+		vec3(+0.0f, +0.0f, -1.0f),  // Normal
+		vec3(+1.0f, -1.0f, -1.0f),  // 6
+		vec3(+0.8f, +0.6f, +0.4f),  // Color
+		vec3(+0.0f, +0.0f, -1.0f),  // Normal
+		vec3(-1.0f, -1.0f, -1.0f),  // 7
+		vec3(+0.3f, +1.0f, +0.5f),  // Color
+		vec3(+0.0f, +0.0f, -1.0f),  // Normal
 
-		vec3(+1.0f, +1.0f, -1.0f), // 8
-		vec3(+0.2f, +0.5f, +0.2f), // Color
-		vec3(+1.0f, +1.0f, +1.0f), // 9
-		vec3(+0.9f, +0.3f, +0.7f), // Color
-		vec3(+1.0f, -1.0f, +1.0f), // 10
-		vec3(+0.3f, +0.7f, +0.5f), // Color
-		vec3(+1.0f, -1.0f, -1.0f), // 11
-		vec3(+0.5f, +0.7f, +0.5f), // Color
+		vec3(+1.0f, +1.0f, -1.0f),  // 8
+		vec3(+0.2f, +0.5f, +0.2f),  // Color
+		vec3(+1.0f, +0.0f, +0.0f),  // Normal
+		vec3(+1.0f, +1.0f, +1.0f),  // 9
+		vec3(+0.9f, +0.3f, +0.7f),  // Color
+		vec3(+1.0f, +0.0f, +0.0f),  // Normal
+		vec3(+1.0f, -1.0f, +1.0f),  // 10
+		vec3(+0.3f, +0.7f, +0.5f),  // Color
+		vec3(+1.0f, +0.0f, +0.0f),  // Normal
+		vec3(+1.0f, -1.0f, -1.0f),  // 11
+		vec3(+0.5f, +0.7f, +0.5f),  // Color
+		vec3(+1.0f, +0.0f, +0.0f),  // Normal
 
-		vec3(-1.0f, +1.0f, +1.0f), // 12
-		vec3(+0.7f, +0.8f, +0.2f), // Color
-		vec3(-1.0f, +1.0f, -1.0f), // 13
-		vec3(+0.5f, +0.7f, +0.3f), // Color
-		vec3(-1.0f, -1.0f, -1.0f), // 14
-		vec3(+0.4f, +0.7f, +0.7f), // Color
-		vec3(-1.0f, -1.0f, +1.0f), // 15
-		vec3(+0.2f, +0.5f, +1.0f), // Color
+		vec3(-1.0f, +1.0f, +1.0f),  // 12
+		vec3(+0.7f, +0.8f, +0.2f),  // Color
+		vec3(-1.0f, +0.0f, +0.0f),  // Normal
+		vec3(-1.0f, +1.0f, -1.0f),  // 13
+		vec3(+0.5f, +0.7f, +0.3f),  // Color
+		vec3(-1.0f, +0.0f, +0.0f),  // Normal
+		vec3(-1.0f, -1.0f, -1.0f),  // 14
+		vec3(+0.4f, +0.7f, +0.7f),  // Color
+		vec3(-1.0f, +0.0f, +0.0f),  // Normal
+		vec3(-1.0f, -1.0f, +1.0f),  // 15
+		vec3(+0.2f, +0.5f, +1.0f),  // Color
+		vec3(-1.0f, +0.0f, +0.0f),  // Normal
 
-		vec3(+1.0f, +1.0f, +1.0f), // 16
-		vec3(+0.6f, +1.0f, +0.7f), // Color
-		vec3(-1.0f, +1.0f, +1.0f), // 17
-		vec3(+0.6f, +0.4f, +0.8f), // Color
-		vec3(-1.0f, -1.0f, +1.0f), // 18
-		vec3(+0.2f, +0.8f, +0.7f), // Color
-		vec3(+1.0f, -1.0f, +1.0f), // 19
-		vec3(+0.2f, +0.7f, +1.0f), // Color
+		vec3(+1.0f, +1.0f, +1.0f),  // 16
+		vec3(+0.6f, +1.0f, +0.7f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal
+		vec3(-1.0f, +1.0f, +1.0f),  // 17
+		vec3(+0.6f, +0.4f, +0.8f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal
+		vec3(-1.0f, -1.0f, +1.0f),  // 18
+		vec3(+0.2f, +0.8f, +0.7f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal
+		vec3(+1.0f, -1.0f, +1.0f),  // 19
+		vec3(+0.2f, +0.7f, +1.0f),  // Color
+		vec3(+0.0f, +0.0f, +1.0f),  // Normal
 
-		vec3(+1.0f, -1.0f, -1.0f), // 20
-		vec3(+0.8f, +0.3f, +0.7f), // Color
-		vec3(-1.0f, -1.0f, -1.0f), // 21
-		vec3(+0.8f, +0.9f, +0.5f), // Color
-		vec3(-1.0f, -1.0f, +1.0f), // 22
-		vec3(+0.5f, +0.8f, +0.5f), // Color
-		vec3(+1.0f, -1.0f, +1.0f), // 23
-		vec3(+0.9f, +1.0f, +0.2f), // Color
+		vec3(+1.0f, -1.0f, -1.0f),  // 20
+		vec3(+0.8f, +0.3f, +0.7f),  // Color
+		vec3(+0.0f, -1.0f, +0.0f),  // Normal
+		vec3(-1.0f, -1.0f, -1.0f),  // 21
+		vec3(+0.8f, +0.9f, +0.5f),  // Color
+		vec3(+0.0f, -1.0f, +0.0f),  // Normal
+		vec3(-1.0f, -1.0f, +1.0f),  // 22
+		vec3(+0.5f, +0.8f, +0.5f),  // Color
+		vec3(+0.0f, -1.0f, +0.0f),  // Normal
+		vec3(+1.0f, -1.0f, +1.0f),  // 23
+		vec3(+0.9f, +1.0f, +0.2f),  // Color
+		vec3(+0.0f, -1.0f, +0.0f),  // Normal
 	};
 
 	ret.numVertices = NUM_ARRAY_ELEMENTS(stackVerts);
@@ -105,5 +142,58 @@ ShapeData ShapeGenerator::makeCube() {
 	ret.indices = new GLushort[ret.numIndices];
 	memcpy(ret.indices, stackIndices, sizeof(stackIndices));
 
+	return ret;
+}
+
+ShapeData ShapeGenerator::makePlane(uint dimensions)
+{
+	ShapeData ret = makePlaneVerts(dimensions);
+	ShapeData ret2 = makePlaneIndices(dimensions);
+	ret.numIndices = ret2.numIndices;
+	ret.indices = ret2.indices;
+	return ret;
+}
+
+ShapeData ShapeGenerator::makePlaneVerts(uint dimensions)
+{
+	ShapeData ret;
+	ret.numVertices = dimensions * dimensions;
+	int half = dimensions / 2;
+	ret.vertices = new Vertex[ret.numVertices];
+	for (int i = 0; i < dimensions; i++)
+	{
+		for (int j = 0; j < dimensions; j++)
+		{
+			Vertex& thisVert = ret.vertices[i * dimensions + j];
+			thisVert.position.x = j - half;
+			thisVert.position.z = i - half;
+			thisVert.position.y = 0;
+			thisVert.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+			thisVert.color = randomColor();
+		}
+	}
+	return ret;
+}
+
+ShapeData ShapeGenerator::makePlaneIndices(uint dimensions)
+{
+	ShapeData ret;
+	ret.numIndices = (dimensions - 1) * (dimensions - 1) * 2 * 3; // 2 triangles per square, 3 indices per triangle
+	ret.indices = new unsigned short[ret.numIndices];
+	int runner = 0;
+	for (int row = 0; row < dimensions - 1; row++)
+	{
+		for (int col = 0; col < dimensions - 1; col++)
+		{
+			ret.indices[runner++] = dimensions * row + col;
+			ret.indices[runner++] = dimensions * row + col + dimensions;
+			ret.indices[runner++] = dimensions * row + col + dimensions + 1;
+
+			ret.indices[runner++] = dimensions * row + col;
+			ret.indices[runner++] = dimensions * row + col + dimensions + 1;
+			ret.indices[runner++] = dimensions * row + col + 1;
+		}
+	}
+	assert(runner = ret.numIndices);
 	return ret;
 }

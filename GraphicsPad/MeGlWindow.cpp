@@ -30,16 +30,16 @@ Camera camera;
 
 void MeGlWindow::sendDataToOpenGL()
 {
-	ShapeData shape = ShapeGenerator::makeCube();
+	ShapeData shape = ShapeGenerator::makePlane(20);
 
 	GLuint vertexBufferID;
 	glGenBuffers(1, &vertexBufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBufferData(GL_ARRAY_BUFFER, shape.vertexBufferSize(), shape.vertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (char*)(sizeof(float) * 3));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (char*)(sizeof(float) * 3));
 
 	GLuint indexArrayBufferID;
 	glGenBuffers(1, &indexArrayBufferID);
@@ -65,7 +65,7 @@ void MeGlWindow::paintGL()
 	GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
 	GLint ambientLoca = glGetUniformLocation(programID, "ambient");
 
-	vec3 ambient(0.15f, 0.1f, 0.15f);
+	vec3 ambient(1.0f, 1.0f, 1.0f);
 
 	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
 	glUniform3fv(ambientLoca, 1, &ambient[0]);
