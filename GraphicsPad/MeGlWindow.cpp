@@ -65,14 +65,17 @@ void MeGlWindow::paintGL()
 	mat4 Mx = Mproj * camera.getWorldToViewMatrix();//Mproj * Mt * Mr; //* Mt * Mr
 	vec3 ambient(0.1f, 0.1f, 0.1f);
 	vec3 lightPosition(0.0f, 3.0f, 0.0f);
+	vec3 camPosition = camera.getPosition();
 	
 	GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
 	GLint ambientLoca = glGetUniformLocation(programID, "ambient");
 	GLint lightPositionUniformLoca = glGetUniformLocation(programID, "lightPos");
+	GLint camPosLocation = glGetUniformLocation(programID, "camPos");
 
 	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
 	glUniform3fv(ambientLoca, 1, &ambient[0]);
 	glUniform3fv(lightPositionUniformLoca, 1, &lightPosition[0]);
+	glUniform3fv(camPosLocation, 1, &camPosition[0]);
 
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
 }

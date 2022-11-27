@@ -13,6 +13,7 @@ public:
 	Camera();
 	void mouseUpdate(const glm::vec2& newMousePosition);
 	glm::mat4 getWorldToViewMatrix() const;
+	glm::vec3 getPosition() const;
 
 	void moveForward();
 	void moveBackward();

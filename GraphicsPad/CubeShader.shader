@@ -27,6 +27,7 @@ void main()
 
 uniform vec3 ambient;
 uniform vec3 lightPos;
+uniform vec3 camPos;
 
 out vec4 drawColor;
 in vec3 vecOutColor;
@@ -36,8 +37,13 @@ in vec3 myPosition;
 void main()
 {
 	vec3 lightVec = normalize(lightPos - myPosition);
-	float brightness = max(dot(lightVec, myNormal), 0.0f) * 0.7f;
-	vec3 c = vec3(brightness, brightness, brightness) + ambient;
+	vec3 camVec = normalize(camPos - myPosition);
+	vec3 halfVec = normalize(lightVec + camVec);
+	
+	float diffuse = max(dot(lightVec, myNormal), 0.0f) * 0.7f;
+	float specular = max(dot(halfVec, myNormal), 0.0f);
+	specular = pow(specular, 200) * 0.2f;
+	vec3 c = vec3(diffuse, diffuse, diffuse) + vec3(specular, specular, specular) + ambient;
 	c = clamp(c, 0.0f, 1.0f);
 	drawColor = vec4(c, 1.0f);
 };
