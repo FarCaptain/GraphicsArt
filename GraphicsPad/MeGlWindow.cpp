@@ -63,19 +63,29 @@ void MeGlWindow::paintGL()
 	mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 100.f);
 
 	mat4 Mx = Mproj * camera.getWorldToViewMatrix();//Mproj * Mt * Mr; //* Mt * Mr
-	vec3 ambient(0.1f, 0.1f, 0.1f);
 	vec3 lightPosition(0.0f, 3.0f, 0.0f);
 	vec3 camPosition = camera.getPosition();
+
+	vec3 ambient(0.1f, 0.1f, 0.1f);
+	vec3 specularColor(1.0f, 1.0f, 1.0f);
+	float intensity = 0.3f;
+	float ambientIntensity = 0.1f;
 	
 	GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
-	GLint ambientLoca = glGetUniformLocation(programID, "ambient");
 	GLint lightPositionUniformLoca = glGetUniformLocation(programID, "lightPos");
 	GLint camPosLocation = glGetUniformLocation(programID, "camPos");
+	GLint KaLocation = glGetUniformLocation(programID, "Ka");
+	GLint KsLocation = glGetUniformLocation(programID, "Ks");
+	GLint IaLocation = glGetUniformLocation(programID, "Ia");
+	GLint ILocation = glGetUniformLocation(programID, "I");
 
 	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
-	glUniform3fv(ambientLoca, 1, &ambient[0]);
 	glUniform3fv(lightPositionUniformLoca, 1, &lightPosition[0]);
 	glUniform3fv(camPosLocation, 1, &camPosition[0]);
+	glUniform3fv(KaLocation, 1, &ambient[0]);
+	glUniform3fv(KsLocation, 1, &specularColor[0]);
+	glUniform1f(IaLocation, ambientIntensity);
+	glUniform1f(ILocation, intensity);
 
 	glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
 }

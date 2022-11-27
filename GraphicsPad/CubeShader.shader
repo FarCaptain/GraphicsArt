@@ -25,9 +25,12 @@ void main()
 #shader FRAGMENT
 #version 430
 
-uniform vec3 ambient;
 uniform vec3 lightPos;
 uniform vec3 camPos;
+uniform vec3 Ka;
+uniform vec3 Ks;
+uniform float Ia;
+uniform float I;
 
 out vec4 drawColor;
 in vec3 vecOutColor;
@@ -39,11 +42,13 @@ void main()
 	vec3 lightVec = normalize(lightPos - myPosition);
 	vec3 camVec = normalize(camPos - myPosition);
 	vec3 halfVec = normalize(lightVec + camVec);
+
+	float r = length(lightVec);
+	float coe = I / (r * r);
 	
-	float diffuse = max(dot(lightVec, myNormal), 0.0f) * 0.7f;
+	float diffuse = coe * max(dot(lightVec, myNormal), 0.0f);
 	float specular = max(dot(halfVec, myNormal), 0.0f);
-	specular = pow(specular, 200) * 0.2f;
-	vec3 c = vec3(diffuse, diffuse, diffuse) + vec3(specular, specular, specular) + ambient;
+	vec3 c = vec3(diffuse, diffuse, diffuse) + Ks * coe * pow(specular, 16) + Ka * Ia;
 	c = clamp(c, 0.0f, 1.0f);
 	drawColor = vec4(c, 1.0f);
 };
