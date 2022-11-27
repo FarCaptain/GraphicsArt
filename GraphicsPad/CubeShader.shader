@@ -36,7 +36,7 @@ in vec3 myPosition;
 void main()
 {
 	vec3 lightVec = normalize(lightPos - myPosition);
-	float brightness = dot(lightVec, myNormal);
+	float brightness = max(dot(lightVec, myNormal), 0.0f) * 0.7f;
 	vec3 c = vec3(brightness, brightness, brightness) + ambient;
 	c = clamp(c, 0.0f, 1.0f);
 	drawColor = vec4(c, 1.0f);
