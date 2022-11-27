@@ -17,7 +17,7 @@ void main()
 {
 	vec4 p = vec4(position, 1.0);
 	gl_Position = transformMat * p;
-	//vecOutColor = vertexColor * ambient;
+	vecOutColor = vertexColor;
 	myNormal = normal;
 	myPosition = position;
 }
@@ -48,7 +48,7 @@ void main()
 	
 	float diffuse = coe * max(dot(lightVec, myNormal), 0.0f);
 	float specular = max(dot(halfVec, myNormal), 0.0f);
-	vec3 c = vec3(diffuse, diffuse, diffuse) + Ks * coe * pow(specular, 16) + Ka * Ia;
+	vec3 c = vecOutColor * diffuse + Ks * coe * pow(specular, 16) + Ka * Ia;
 	c = clamp(c, 0.0f, 1.0f);
 	drawColor = vec4(c, 1.0f);
 };

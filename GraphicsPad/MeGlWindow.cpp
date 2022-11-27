@@ -68,7 +68,7 @@ void MeGlWindow::paintGL()
 
 	vec3 ambient(0.1f, 0.1f, 0.1f);
 	vec3 specularColor(1.0f, 1.0f, 1.0f);
-	float intensity = 0.3f;
+	float intensity = 0.5f;
 	float ambientIntensity = 0.1f;
 	
 	GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
