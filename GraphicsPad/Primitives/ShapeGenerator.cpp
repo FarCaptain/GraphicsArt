@@ -334,7 +334,7 @@ ShapeData ShapeGenerator::makePlaneVerts(uint dimensions)
 			thisVert.position.z = i - half;
 			thisVert.position.y = 0;
 			thisVert.normal = glm::vec3(0.0f, 1.0f, 0.0f);
-			thisVert.color = randomColor();
+			thisVert.color = vec3(1.0f, 1.0f, 1.0f);//randomColor();
 		}
 	}
 	return ret;

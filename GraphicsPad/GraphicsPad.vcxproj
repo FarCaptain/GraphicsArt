@@ -162,6 +162,9 @@
     <ClInclude Include="Primitives\ShapeGenerator.h" />
     <ClInclude Include="ShaderLoader.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Passthrough.shader" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
