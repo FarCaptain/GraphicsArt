@@ -21,6 +21,7 @@ const uint NUM_VERTICES_PER_TRI = 3;
 const uint NUM_FLOATS_PER_VERTICE = 6;
 const uint VERTEX_BYTE_SIZE = NUM_FLOATS_PER_VERTICE * sizeof(float);
 GLuint programID;
+GLuint passthroughID;
 GLuint numIndices;
 
 float vx = 0;
@@ -85,8 +86,8 @@ void MeGlWindow::sendDataToOpenGL()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)cubeByteOffset);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(cubeByteOffset + sizeof(float) * 3));
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(cubeByteOffset + sizeof(float) * 6));
+	//glEnableVertexAttribArray(2);
+	//glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(cubeByteOffset + sizeof(float) * 6));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID);
 
 	plane.cleanup();
@@ -103,6 +104,7 @@ void MeGlWindow::paintGL()
 
 	mat4 Mr = glm::rotate(mat4(), angle, vec3(1.0f, 0.0f, 0.0f));
 	mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 100.f);
+	mat4 Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f));
 
 	mat4 Mx = Mproj * camera.getWorldToViewMatrix();//Mproj * Mt * Mr; //* Mt * Mr
 	mat4 Mx1 = Mproj * Mt * Mr * camera.getWorldToViewMatrix();
@@ -122,7 +124,9 @@ void MeGlWindow::paintGL()
 	GLint IaLocation = glGetUniformLocation(programID, "Ia");
 	GLint ILocation = glGetUniformLocation(programID, "I");
 
+	// plane
 	glBindVertexArray(planeVertexArrayObjectID);
+	glUseProgram(programID);
 	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
 	glUniform3fv(lightPositionUniformLoca, 1, &lightPosition[0]);
 	glUniform3fv(camPosLocation, 1, &camPosition[0]);
@@ -132,14 +136,16 @@ void MeGlWindow::paintGL()
 	glUniform1f(ILocation, intensity);
 	glDrawElements(GL_TRIANGLES, planeNumIndices, GL_UNSIGNED_SHORT, (void*)planeIndexByteOffset);
 
+
+
+	// light cube
 	glBindVertexArray(cubeVertexArrayObjectID);
-	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
-	glUniform3fv(lightPositionUniformLoca, 1, &lightPosition[0]);
-	glUniform3fv(camPosLocation, 1, &camPosition[0]);
-	glUniform3fv(KaLocation, 1, &ambient[0]);
-	glUniform3fv(KsLocation, 1, &specularColor[0]);
-	glUniform1f(IaLocation, ambientIntensity);
-	glUniform1f(ILocation, intensity);
+	glUseProgram(passthroughID);
+	Mt = glm::translate(mat4(), lightPosition);
+	Ms = glm::scale(vec3(0.3f, 0.3f, 0.3f));
+	Mx = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+	GLint LightCubeMxUniformLocation = glGetUniformLocation(passthroughID, "modelToProjectionMatrix");
+	glUniformMatrix4fv(LightCubeMxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
 	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
 }
 
@@ -216,6 +222,23 @@ void installShaders()
 		return;
 
 	glUseProgram(programID);
+
+
+	source = GetShaderSource("Passthrough.shader");
+	adapter[0] = source.VertexSource.c_str();
+	glShaderSource(vertexShaderID, 1, adapter, 0);
+	adapter[0] = source.FragmentSource.c_str();
+	glShaderSource(fragmentShaderID, 1, adapter, 0);
+
+	glCompileShader(vertexShaderID);
+	glCompileShader(fragmentShaderID);
+
+	passthroughID = glCreateProgram();
+	glAttachShader(passthroughID, vertexShaderID);
+	glAttachShader(passthroughID, fragmentShaderID);
+	glLinkProgram(passthroughID);
+
+	//glUseProgram(passthroughID);
 }
 
 void MeGlWindow::initializeGL()
