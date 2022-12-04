@@ -32,20 +32,24 @@ Camera camera;
 GLuint planeIndexByteOffset;
 GLuint cubeIndexByteOffset;
 GLuint sphereIndexByteOffset;
+GLuint arrowIndexByteOffset;
 
 GLuint planeNumIndices;
 GLuint cubeNumIndices;
 GLuint sphereNumIndices;
+GLuint arrowNumIndices;
 
 GLuint planeVertexArrayObjectID;
 GLuint cubeVertexArrayObjectID;
 GLuint sphereVertexArrayObjectID;
+GLuint arrowVertexArrayObjectID;
 
 void MeGlWindow::sendDataToOpenGL()
 {
 	ShapeData plane = ShapeGenerator::makePlane(20);
 	ShapeData cube = ShapeGenerator::makeCube();
 	ShapeData sphere = ShapeGenerator::makeSphere();
+	ShapeData arrow = ShapeGenerator::makeArrow();
 
 	GLuint vertexBufferID;
 	glGenBuffers(1, &vertexBufferID);
@@ -53,6 +57,7 @@ void MeGlWindow::sendDataToOpenGL()
 	glBufferData(GL_ARRAY_BUFFER,
 		plane.vertexBufferSize() + plane.indexBufferSize() +
 		sphere.vertexBufferSize() + sphere.indexBufferSize() +
+		arrow.vertexBufferSize() + arrow.indexBufferSize() +
 		cube.vertexBufferSize() + cube.indexBufferSize(), NULL, GL_STATIC_DRAW);
 
 	GLsizeiptr currentOffset = 0;
@@ -68,6 +73,12 @@ void MeGlWindow::sendDataToOpenGL()
 	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, sphere.indexBufferSize(), sphere.indices);
 	currentOffset += sphere.indexBufferSize();
 
+	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, arrow.vertexBufferSize(), arrow.vertices);
+	currentOffset += arrow.vertexBufferSize();
+	arrowIndexByteOffset = currentOffset;
+	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, arrow.indexBufferSize(), arrow.indices);
+	currentOffset += arrow.indexBufferSize();
+
 	glBufferSubData(GL_ARRAY_BUFFER, currentOffset, cube.vertexBufferSize(), cube.vertices);
 	currentOffset += cube.vertexBufferSize();
 	cubeIndexByteOffset = currentOffset;
@@ -77,10 +88,12 @@ void MeGlWindow::sendDataToOpenGL()
 	planeNumIndices = plane.numIndices;
 	cubeNumIndices = cube.numIndices;
 	sphereNumIndices = sphere.numIndices;
+	arrowNumIndices = arrow.numIndices;
 
 	glGenVertexArrays(1, &planeVertexArrayObjectID);
 	glGenVertexArrays(1, &cubeVertexArrayObjectID);
 	glGenVertexArrays(1, &sphereVertexArrayObjectID);
+	glGenVertexArrays(1, &arrowVertexArrayObjectID);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBindVertexArray(planeVertexArrayObjectID);
@@ -103,7 +116,18 @@ void MeGlWindow::sendDataToOpenGL()
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(sphereByteOffset + sizeof(float) * 6));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID);
 
-	GLuint cubeByteOffset = sphereByteOffset + sphere.vertexBufferSize() + sphere.indexBufferSize();
+	GLuint arrowByteOffset = sphereByteOffset + sphere.vertexBufferSize() + sphere.indexBufferSize();
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
+	glBindVertexArray(arrowVertexArrayObjectID);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)arrowByteOffset);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(arrowByteOffset + sizeof(float) * 3));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(arrowByteOffset + sizeof(float) * 6));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID);
+
+	GLuint cubeByteOffset = arrowByteOffset + arrow.vertexBufferSize() + arrow.indexBufferSize();
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBindVertexArray(cubeVertexArrayObjectID);
 	glEnableVertexAttribArray(0);
@@ -116,6 +140,7 @@ void MeGlWindow::sendDataToOpenGL()
 
 	plane.cleanup();
 	sphere.cleanup();
+	arrow.cleanup();
 	cube.cleanup();
 }
 
@@ -169,6 +194,13 @@ void MeGlWindow::paintGL()
 	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
 	glDrawElements(GL_TRIANGLES, sphereNumIndices, GL_UNSIGNED_SHORT, (void*)sphereIndexByteOffset);
 
+	/// Arrows
+	glBindVertexArray(arrowVertexArrayObjectID);
+	Mt = glm::translate(mat4(), vec3(1, 1, 0.5));
+	Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f));
+	Mx = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
+	glDrawElements(GL_TRIANGLES, arrowNumIndices, GL_UNSIGNED_SHORT, (void*)arrowIndexByteOffset);
 
 	/// Cube
 	glBindVertexArray(cubeVertexArrayObjectID);
@@ -183,7 +215,7 @@ void MeGlWindow::paintGL()
 	glBindVertexArray(cubeVertexArrayObjectID);
 	glUseProgram(passthroughID);
 	Mt = glm::translate(mat4(), lightPosition);
-	Ms = glm::scale(vec3(0.3f, 0.3f, 0.3f));
+	Ms = glm::scale(vec3(0.1f, 0.1f, 0.1f));
 	Mx = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
 	GLint LightCubeMxUniformLocation = glGetUniformLocation(passthroughID, "modelToProjectionMatrix");
 	glUniformMatrix4fv(LightCubeMxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
