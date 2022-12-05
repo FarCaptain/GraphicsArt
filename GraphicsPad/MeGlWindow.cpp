@@ -156,8 +156,8 @@ void MeGlWindow::paintGL()
 	mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 100.f);
 	mat4 Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f));
 
-	mat4 Mx = Mproj * camera.getWorldToViewMatrix();//Mproj * Mt * Mr; //* Mt * Mr
-	mat4 Mx1 = Mproj * Mt * Mr * camera.getWorldToViewMatrix();
+	mat4 Mx[5];
+	Mx[0] = Mproj * camera.getWorldToViewMatrix();//Mproj * Mt * Mr; //* Mt * Mr
 	vec3 lightPosition(0.0f, 3.0f, 0.0f);
 	vec3 camPosition = camera.getPosition();
 
@@ -177,7 +177,7 @@ void MeGlWindow::paintGL()
 	// plane
 	glBindVertexArray(planeVertexArrayObjectID);
 	glUseProgram(programID);
-	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
+	glUniformMatrix4fv(MxUniformLocation, 5, GL_FALSE, &Mx[0][0][0]);
 	glUniform3fv(lightPositionUniformLoca, 1, &lightPosition[0]);
 	glUniform3fv(camPosLocation, 1, &camPosition[0]);
 	glUniform3fv(KaLocation, 1, &ambient[0]);
@@ -188,27 +188,35 @@ void MeGlWindow::paintGL()
 
 	/// Spheres
 	glBindVertexArray(sphereVertexArrayObjectID);
-	Mt = glm::translate(mat4(), vec3(0, 0, 0));
-	Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f));
-	Mx = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
-	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
-	glDrawElements(GL_TRIANGLES, sphereNumIndices, GL_UNSIGNED_SHORT, (void*)sphereIndexByteOffset);
+
+	#pragma region calc Matrixs
+	Mt = glm::translate(mat4(), vec3(-3, 3, 2)), Ms = glm::scale(vec3(0.2f, 0.2f, 0.2f));
+	Mx[0] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+
+	Mt = glm::translate(mat4(), vec3(-1, 1, -0.5)), Ms = glm::scale(vec3(0.5f, 0.5f, 0.5f));
+	Mx[1] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+
+	Mt = glm::translate(mat4(), vec3(4, 2, -1)), Ms = glm::scale(vec3(1.2f, 1.2f, 1.2f));
+	Mx[2] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+	#pragma endregion
+	glUniformMatrix4fv(MxUniformLocation, 3, GL_FALSE, &Mx[0][0][0]);
+	glDrawElementsInstanced(GL_TRIANGLES, sphereNumIndices, GL_UNSIGNED_SHORT, (void*)sphereIndexByteOffset, 3);
 
 	/// Arrows
 	glBindVertexArray(arrowVertexArrayObjectID);
 	Mt = glm::translate(mat4(), vec3(1, 1, 0.5));
 	Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f));
-	Mx = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
-	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
+	Mx[0] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0][0]);
 	glDrawElements(GL_TRIANGLES, arrowNumIndices, GL_UNSIGNED_SHORT, (void*)arrowIndexByteOffset);
 
 	/// Cube
 	glBindVertexArray(cubeVertexArrayObjectID);
 	Mt = glm::translate(mat4(), vec3(5, 1, 3));
 	Ms = glm::scale(vec3(0.6f, 0.6f, 0.6f));
-	Mx = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+	Mx[0] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
 	// the only thing changes at the moment is the MVP mat
-	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
+	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0][0]);
 	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
 
 	/// light cube
@@ -216,9 +224,9 @@ void MeGlWindow::paintGL()
 	glUseProgram(passthroughID);
 	Mt = glm::translate(mat4(), lightPosition);
 	Ms = glm::scale(vec3(0.1f, 0.1f, 0.1f));
-	Mx = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+	Mx[0] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
 	GLint LightCubeMxUniformLocation = glGetUniformLocation(passthroughID, "modelToProjectionMatrix");
-	glUniformMatrix4fv(LightCubeMxUniformLocation, 1, GL_FALSE, &Mx[0][0]);
+	glUniformMatrix4fv(LightCubeMxUniformLocation, 1, GL_FALSE, &Mx[0][0][0]);
 	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
 }
 

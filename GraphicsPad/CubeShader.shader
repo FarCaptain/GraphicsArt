@@ -6,7 +6,7 @@ in layout(location = 1) vec3 vertexColor;
 in layout(location = 2) vec3 normal;
 
 uniform vec3 ambient;
-uniform mat4 transformMat;
+uniform mat4 transformMat[5];
 uniform vec3 lightPos;
 
 out vec3 vecOutColor;
@@ -16,10 +16,10 @@ out vec3 myPosition;
 void main()
 {
 	vec4 p = vec4(position, 1.0);
-	gl_Position = transformMat * p;
+	gl_Position = transformMat[gl_InstanceID] * p;
 	vecOutColor = vertexColor;
 	myNormal = normal;
-	myPosition = position;
+	myPosition = vec3(gl_Position.x, gl_Position.y, gl_Position.z);
 }
 
 #shader FRAGMENT
