@@ -39,6 +39,7 @@ uniform float Ia;
 uniform float I;
 
 uniform sampler2D Tex;
+uniform sampler2D DaNormalMap;
 
 out vec4 drawColor;
 in vec3 vecOutColor;
@@ -52,11 +53,14 @@ void main()
 	vec3 camVec = normalize(camPos - myPosition);
 	vec3 halfVec = normalize(lightVec + camVec);
 
+	vec3 normal = myNormal;
+	normal = texture(DaNormalMap, myTexCoord).xyz * 2.0f - 1.0f;
+
 	float r = length(lightVec);
 	float coe = I / (r * r);
-	
-	float diffuse = coe * max(dot(lightVec, myNormal), 0.0f);
-	float specular = max(dot(halfVec, myNormal), 0.0f);
+
+	float diffuse = coe * max(dot(lightVec, normal), 0.0f);
+	float specular = max(dot(halfVec, normal), 0.0f);
 
 	vec3 texColor = vec3(texture(Tex, myTexCoord));
 	vec3 c = vecOutColor * texColor * diffuse + Ks * coe * pow(specular, 16) + Ka * Ia;

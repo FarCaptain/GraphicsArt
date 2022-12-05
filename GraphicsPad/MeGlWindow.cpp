@@ -187,33 +187,15 @@ void MeGlWindow::paintGL()
 	GLint KsLocation = glGetUniformLocation(programID, "Ks");
 	GLint IaLocation = glGetUniformLocation(programID, "Ia");
 	GLint ILocation = glGetUniformLocation(programID, "I");
-
-	// load Texture
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load and generate the texture
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("texture/Water.jpg", &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
+	GLint tex1_loc = glGetUniformLocation(programID, "Tex");
+	GLint tex2_loc = glGetUniformLocation(programID, "DaNormalMap");
 
 	// plane
 	glBindVertexArray(planeVertexArrayObjectID);
 	glUseProgram(programID);
+	glUniform1i(tex1_loc, 0);
+	glUniform1i(tex2_loc, 1);
+
 	glUniformMatrix4fv(MxUniformLocation, 5, GL_FALSE, &Mx[0][0][0]);
 	glUniformMatrix4fv(MvpUniformLocation, 1, GL_FALSE, &Mvp[0][0]);
 	glUniform3fv(lightPositionUniformLoca, 1, &lightPosition[0]);
@@ -222,8 +204,7 @@ void MeGlWindow::paintGL()
 	glUniform3fv(KsLocation, 1, &specularColor[0]);
 	glUniform1f(IaLocation, ambientIntensity);
 	glUniform1f(ILocation, intensity);
-	glDrawElements(GL_TRIANGLES, planeNumIndices, GL_UNSIGNED_SHORT, (void*)planeIndexByteOffset);
-
+	//glDrawElements(GL_TRIANGLES, planeNumIndices, GL_UNSIGNED_SHORT, (void*)planeIndexByteOffset);
 
 	// normal plane
 	glBindVertexArray(planeVertexArrayObjectID);
@@ -248,14 +229,14 @@ void MeGlWindow::paintGL()
 	Mx[2] = Mt * Ms;
 	#pragma endregion
 	glUniformMatrix4fv(MxUniformLocation, 3, GL_FALSE, &Mx[0][0][0]);
-	glDrawElementsInstanced(GL_TRIANGLES, sphereNumIndices, GL_UNSIGNED_SHORT, (void*)sphereIndexByteOffset, 3);
+	//glDrawElementsInstanced(GL_TRIANGLES, sphereNumIndices, GL_UNSIGNED_SHORT, (void*)sphereIndexByteOffset, 3);
 
 	/// Arrows
 	glBindVertexArray(arrowVertexArrayObjectID);
 	Mt = glm::translate(mat4(), vec3(5, 3, -5)), Mr = glm::rotate(90.0f,vec3(1.0f, 0.0f, 0.0f)), Ms = glm::scale(vec3(2.0f, 1.0f, 3.0f)); Mx[0] = Mt * Mr * Ms;
 	Mt = glm::translate(mat4(), vec3(3, 1, 2)), Mr = glm::rotate(30.0f, vec3(0.0f, 1.0f, 0.0f)), Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f)); Mx[1] = Mt * Mr * Ms;
 	glUniformMatrix4fv(MxUniformLocation, 2, GL_FALSE, &Mx[0][0][0]);
-	glDrawElementsInstanced(GL_TRIANGLES, arrowNumIndices, GL_UNSIGNED_SHORT, (void*)arrowIndexByteOffset, 2);
+	//glDrawElementsInstanced(GL_TRIANGLES, arrowNumIndices, GL_UNSIGNED_SHORT, (void*)arrowIndexByteOffset, 2);
 
 	/// Cube
 	glBindVertexArray(cubeVertexArrayObjectID);
@@ -263,7 +244,7 @@ void MeGlWindow::paintGL()
 	Mt = glm::translate(mat4(), vec3(-3, 0.6, -4)), Mr = glm::rotate(-45.0f, vec3(0.0f, 0.0f, 1.0f)), Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f)); Mx[1] = Mt * Mr * Ms;
 	// the only thing changes at the moment is the MVP mat
 	glUniformMatrix4fv(MxUniformLocation, 2, GL_FALSE, &Mx[0][0][0]);
-	glDrawElementsInstanced(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset, 2);
+	//glDrawElementsInstanced(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset, 2);
 
 	/// light cube
 	glBindVertexArray(cubeVertexArrayObjectID);
@@ -275,7 +256,7 @@ void MeGlWindow::paintGL()
 	GLint LightCubeMvpUniformLocation = glGetUniformLocation(passthroughID, "viewProjectionMatrix");
 	glUniformMatrix4fv(LightCubeMxUniformLocation, 1, GL_FALSE, &Mx[0][0][0]);
 	glUniformMatrix4fv(LightCubeMvpUniformLocation, 1, GL_FALSE, &Mvp[0][0]);
-	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
+	//glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
 }
 
 bool checkStatus(
@@ -370,12 +351,62 @@ void installShaders()
 	//glUseProgram(passthroughID);
 }
 
+void handleTextures()
+{
+	// load Texture
+	GLuint textures[2];
+	glGenTextures(2, textures);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// load and generate the texture
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("texture/Water.jpg", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+
+
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	data = stbi_load("texture/test-min.png", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+}
+
 void MeGlWindow::initializeGL()
 {
 	glewInit();
 	glEnable(GL_DEPTH_TEST);
 	sendDataToOpenGL();
 	installShaders();
+	handleTextures();
 }
 
 void MeGlWindow::mouseMoveEvent(QMouseEvent* e)
