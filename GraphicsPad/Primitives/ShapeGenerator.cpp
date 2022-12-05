@@ -10,10 +10,10 @@ using glm::mat3;
 
 glm::vec3 randomColor()
 {
-	glm::vec3 ret;
-	ret.x = rand() / (float)RAND_MAX;
-	ret.y = rand() / (float)RAND_MAX;
-	ret.z = rand() / (float)RAND_MAX;
+	glm::vec3 ret = vec3(1.0, 1.0, 1.0);;
+	//ret.x = rand() / (float)RAND_MAX;
+	//ret.y = rand() / (float)RAND_MAX;
+	//ret.z = rand() / (float)RAND_MAX;
 	return ret;
 }
 
