@@ -4,6 +4,7 @@
 in layout(location = 0) vec3 position;
 in layout(location = 1) vec3 vertexColor;
 in layout(location = 2) vec3 normal;
+in layout(location = 3) vec3 texCoord;
 
 uniform vec3 ambient;
 uniform mat4 modelMat[5];

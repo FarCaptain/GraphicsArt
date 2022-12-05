@@ -100,44 +100,46 @@ void MeGlWindow::sendDataToOpenGL()
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBindVertexArray(planeVertexArrayObjectID);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, 0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (char*)(sizeof(float) * 3));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (char*)(sizeof(float) * 3));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (char*)(sizeof(float) * 6));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (char*)(sizeof(float) * 6));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID); //?
 
 	GLuint sphereByteOffset = plane.vertexBufferSize() + plane.indexBufferSize();
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBindVertexArray(sphereVertexArrayObjectID);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)sphereByteOffset);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)sphereByteOffset);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(sphereByteOffset + sizeof(float) * 3));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(sphereByteOffset + sizeof(float) * 3));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(sphereByteOffset + sizeof(float) * 6));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(sphereByteOffset + sizeof(float) * 6));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID);
 
 	GLuint arrowByteOffset = sphereByteOffset + sphere.vertexBufferSize() + sphere.indexBufferSize();
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBindVertexArray(arrowVertexArrayObjectID);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)arrowByteOffset);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)arrowByteOffset);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(arrowByteOffset + sizeof(float) * 3));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(arrowByteOffset + sizeof(float) * 3));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(arrowByteOffset + sizeof(float) * 6));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(arrowByteOffset + sizeof(float) * 6));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID);
 
 	GLuint cubeByteOffset = arrowByteOffset + arrow.vertexBufferSize() + arrow.indexBufferSize();
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	glBindVertexArray(cubeVertexArrayObjectID);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)cubeByteOffset);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)cubeByteOffset);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(cubeByteOffset + sizeof(float) * 3));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(cubeByteOffset + sizeof(float) * 3));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (void*)(cubeByteOffset + sizeof(float) * 6));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(cubeByteOffset + sizeof(float) * 6));
+	glEnableVertexAttribArray(3); // UVs
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(cubeByteOffset + sizeof(float) * 6));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID);
 
 	plane.cleanup();
@@ -176,6 +178,20 @@ void MeGlWindow::paintGL()
 	GLint KsLocation = glGetUniformLocation(programID, "Ks");
 	GLint IaLocation = glGetUniformLocation(programID, "Ia");
 	GLint ILocation = glGetUniformLocation(programID, "I");
+
+	// Load texture file 
+	//const char* texName = "texture/Water.jpg";
+	//QImage timg = QGLWidget::convertToGLFormat(QImage(texName, "JPG"));
+	//// Copy file to OpenGL 
+	//glActiveTexture(GL_TEXTURE0);
+	//GLuint tid;
+	//glGenTextures(1, &tid);
+	//glBindTexture(GL_TEXTURE_2D, tid);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, timg.width(), timg.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, timg.bits());
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Set the Tex1 sampler uniform to refer to texture unit 0 
+	//int loc = glGetUniformLocation(programID, "Tex1");
+	//if (loc >= 0) glUniform1i(loc, 0); else fprintf(stderr, "Uniform variable Tex1 not found!\n");
 
 	// plane
 	glBindVertexArray(planeVertexArrayObjectID);
