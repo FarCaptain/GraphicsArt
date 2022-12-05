@@ -14,6 +14,7 @@ uniform vec3 lightPos;
 out vec3 vecOutColor;
 out vec3 myNormal;
 out vec3 myPosition;
+out vec2 myTexCoord;
 
 void main()
 {
@@ -24,6 +25,7 @@ void main()
 	// normal is a vector so ends with 0
 	myNormal = normalize(vec3(Mm * vec4(normal, 0.0f)));
 	myPosition = vec3(Mm * p);
+	myTexCoord = vec2(texCoord);
 }
 
 #shader FRAGMENT
@@ -36,10 +38,13 @@ uniform vec3 Ks;
 uniform float Ia;
 uniform float I;
 
+uniform sampler2D Tex;
+
 out vec4 drawColor;
 in vec3 vecOutColor;
 in vec3 myNormal;
 in vec3 myPosition;
+in vec2 myTexCoord;
 
 void main()
 {
@@ -52,7 +57,9 @@ void main()
 	
 	float diffuse = coe * max(dot(lightVec, myNormal), 0.0f);
 	float specular = max(dot(halfVec, myNormal), 0.0f);
-	vec3 c = vecOutColor * diffuse + Ks * coe * pow(specular, 16) + Ka * Ia;
+
+	vec3 texColor = vec3(texture(Tex, myTexCoord));
+	vec3 c = vecOutColor * texColor * diffuse + Ks * coe * pow(specular, 16) + Ka * Ia;
 	c = clamp(c, 0.0f, 1.0f);
 	drawColor = vec4(c, 1.0f);
 };

@@ -161,6 +161,7 @@
     <ClInclude Include="Primitives\Vertex.h" />
     <ClInclude Include="Primitives\ShapeGenerator.h" />
     <ClInclude Include="ShaderLoader.h" />
+    <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Passthrough.shader" />

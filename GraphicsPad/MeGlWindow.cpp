@@ -12,6 +12,9 @@
 #include <Primitives\ShapeGenerator.h>
 #include <Camera.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 using namespace std;
 using glm::vec3;
 using glm::mat4;
@@ -105,6 +108,8 @@ void MeGlWindow::sendDataToOpenGL()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (char*)(sizeof(float) * 3));
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (char*)(sizeof(float) * 6));
+	glEnableVertexAttribArray(3); // UVs
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(sizeof(float) * 9));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID); //?
 
 	GLuint sphereByteOffset = plane.vertexBufferSize() + plane.indexBufferSize();
@@ -116,6 +121,8 @@ void MeGlWindow::sendDataToOpenGL()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(sphereByteOffset + sizeof(float) * 3));
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(sphereByteOffset + sizeof(float) * 6));
+	glEnableVertexAttribArray(3); // UVs
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(sphereByteOffset + sizeof(float) * 9));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID);
 
 	GLuint arrowByteOffset = sphereByteOffset + sphere.vertexBufferSize() + sphere.indexBufferSize();
@@ -127,6 +134,8 @@ void MeGlWindow::sendDataToOpenGL()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(arrowByteOffset + sizeof(float) * 3));
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(arrowByteOffset + sizeof(float) * 6));
+	glEnableVertexAttribArray(3); // UVs
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(arrowByteOffset + sizeof(float) * 9));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID);
 
 	GLuint cubeByteOffset = arrowByteOffset + arrow.vertexBufferSize() + arrow.indexBufferSize();
@@ -139,7 +148,7 @@ void MeGlWindow::sendDataToOpenGL()
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(cubeByteOffset + sizeof(float) * 6));
 	glEnableVertexAttribArray(3); // UVs
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(cubeByteOffset + sizeof(float) * 6));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 12, (void*)(cubeByteOffset + sizeof(float) * 9));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferID);
 
 	plane.cleanup();
@@ -179,19 +188,28 @@ void MeGlWindow::paintGL()
 	GLint IaLocation = glGetUniformLocation(programID, "Ia");
 	GLint ILocation = glGetUniformLocation(programID, "I");
 
-	// Load texture file 
-	//const char* texName = "texture/Water.jpg";
-	//QImage timg = QGLWidget::convertToGLFormat(QImage(texName, "JPG"));
-	//// Copy file to OpenGL 
-	//glActiveTexture(GL_TEXTURE0);
-	//GLuint tid;
-	//glGenTextures(1, &tid);
-	//glBindTexture(GL_TEXTURE_2D, tid);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, timg.width(), timg.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, timg.bits());
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Set the Tex1 sampler uniform to refer to texture unit 0 
-	//int loc = glGetUniformLocation(programID, "Tex1");
-	//if (loc >= 0) glUniform1i(loc, 0); else fprintf(stderr, "Uniform variable Tex1 not found!\n");
+	// load Texture
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//_MIPMAP_LINEAR
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// load and generate the texture
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("Water.jpg", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		//glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
 
 	// plane
 	glBindVertexArray(planeVertexArrayObjectID);
