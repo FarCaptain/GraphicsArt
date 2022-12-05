@@ -21,5 +21,12 @@ public:
 	void strafeRight();
 	void moveUp();
 	void moveDown();
+
+	glm::vec3 moveVectorForward(glm::vec3 vector);
+	glm::vec3 moveVectorBackward(glm::vec3 vector);
+	glm::vec3 moveVectorLeft(glm::vec3 vector);
+	glm::vec3 moveVectorRight(glm::vec3 vector);
+	glm::vec3 moveVectorUp(glm::vec3 vector);
+	glm::vec3 moveVectorDown(glm::vec3 vector);
 };
 

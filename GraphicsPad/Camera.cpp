@@ -67,3 +67,33 @@ void Camera::moveDown()
 {
 	position += -MOVEMENT_SPEED * UP;
 }
+
+glm::vec3 Camera::moveVectorForward(glm::vec3 vector)
+{
+	return vector += MOVEMENT_SPEED * viewDirection;
+}
+
+glm::vec3 Camera::moveVectorBackward(glm::vec3 vector)
+{
+	return vector += -MOVEMENT_SPEED * viewDirection;
+}
+
+glm::vec3 Camera::moveVectorLeft(glm::vec3 vector)
+{
+	return vector += -MOVEMENT_SPEED * strafeDirection;
+}
+
+glm::vec3 Camera::moveVectorRight(glm::vec3 vector)
+{
+	return vector += MOVEMENT_SPEED * strafeDirection;
+}
+
+glm::vec3 Camera::moveVectorUp(glm::vec3 vector)
+{
+	return vector += MOVEMENT_SPEED * UP;
+}
+
+glm::vec3 Camera::moveVectorDown(glm::vec3 vector)
+{
+	return vector += -MOVEMENT_SPEED * UP;
+}

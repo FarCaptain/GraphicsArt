@@ -44,6 +44,8 @@ GLuint cubeVertexArrayObjectID;
 GLuint sphereVertexArrayObjectID;
 GLuint arrowVertexArrayObjectID;
 
+vec3 lightPosition(0.0f, 3.0f, 0.0f);
+
 void MeGlWindow::sendDataToOpenGL()
 {
 	ShapeData plane = ShapeGenerator::makePlane(20);
@@ -159,7 +161,6 @@ void MeGlWindow::paintGL()
 
 	mat4 Mx[5];
 	Mx[0] = Mt * Ms;
-	vec3 lightPosition(0.0f, 3.0f, 0.0f);
 	vec3 camPosition = camera.getPosition();
 
 	vec3 ambient(1.0f, 1.0f, 1.0f);
@@ -346,22 +347,28 @@ void MeGlWindow::keyPressEvent(QKeyEvent* e)
 	switch (e->key())
 	{
 	case Qt::Key::Key_W:
-		camera.moveForward();
+		//camera.moveForward();
+		lightPosition = camera.moveVectorForward(lightPosition);
 		break;
 	case Qt::Key::Key_S:
-		camera.moveBackward();
+		//camera.moveBackward();
+		lightPosition = camera.moveVectorBackward(lightPosition);
 		break;
 	case Qt::Key::Key_A:
-		camera.strafeLeft();
+		//camera.strafeLeft();
+		lightPosition = camera.moveVectorLeft(lightPosition);
 		break;
 	case Qt::Key::Key_D:
-		camera.strafeRight();
+		//camera.strafeRight();
+		lightPosition = camera.moveVectorRight(lightPosition);
 		break;
 	case Qt::Key::Key_R:
-		camera.moveUp();
+		//camera.moveUp();
+		lightPosition = camera.moveVectorUp(lightPosition);
 		break;
 	case Qt::Key::Key_F:
-		camera.moveDown();
+		//camera.moveDown();
+		lightPosition = camera.moveVectorDown(lightPosition);
 		break;
 	}
 	repaint();
