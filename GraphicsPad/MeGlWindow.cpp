@@ -224,6 +224,16 @@ void MeGlWindow::paintGL()
 	glUniform1f(ILocation, intensity);
 	glDrawElements(GL_TRIANGLES, planeNumIndices, GL_UNSIGNED_SHORT, (void*)planeIndexByteOffset);
 
+
+	// normal plane
+	glBindVertexArray(planeVertexArrayObjectID);
+	glUseProgram(programID);
+	Mt = glm::translate(mat4(), vec3(0.0f, 4.5f, -2.5f)), Ms = glm::scale(vec3(0.5f, 0.5f, 0.5f));
+	Mr = glm::rotate(90.0f, vec3(1.0f, 0.0f, 0.0f));
+	Mx[0] = Mt * Mr * Ms;
+	glUniformMatrix4fv(MxUniformLocation, 5, GL_FALSE, &Mx[0][0][0]);
+	glDrawElements(GL_TRIANGLES, planeNumIndices, GL_UNSIGNED_SHORT, (void*)planeIndexByteOffset);
+
 	/// Spheres
 	glBindVertexArray(sphereVertexArrayObjectID);
 

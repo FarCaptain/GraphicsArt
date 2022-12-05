@@ -5,7 +5,7 @@ const float Camera::MOVEMENT_SPEED = 0.1f;
 
 Camera::Camera() : 
 	viewDirection(0.0f, -0.4f, -1.0f),
-	position(0.0f, 5.5f, 7.6f),
+	position(0.0f, 5.5f, 6.7f),
 	UP(0.0f, 1.0f, 0.0f)
 {
 }
