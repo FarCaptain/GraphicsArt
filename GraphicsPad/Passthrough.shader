@@ -6,11 +6,12 @@ in layout(location = 1) vec3 vertexColor;
 
 out vec3 vertexToFragmentColor;
 
-uniform mat4 modelToProjectionMatrix;
+uniform mat4 modelMatrix;
+uniform mat4 viewProjectionMatrix;
 
 void main()
 {
-	gl_Position = modelToProjectionMatrix * vertexPositionModel;
+	gl_Position = viewProjectionMatrix * modelMatrix * vertexPositionModel;
 	vertexToFragmentColor = vertexColor;
 }
 

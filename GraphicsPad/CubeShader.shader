@@ -6,7 +6,8 @@ in layout(location = 1) vec3 vertexColor;
 in layout(location = 2) vec3 normal;
 
 uniform vec3 ambient;
-uniform mat4 transformMat[5];
+uniform mat4 modelMat[5];
+uniform mat4 viewProjectionMat;
 uniform vec3 lightPos;
 
 out vec3 vecOutColor;
@@ -16,10 +17,12 @@ out vec3 myPosition;
 void main()
 {
 	vec4 p = vec4(position, 1.0);
-	gl_Position = transformMat[gl_InstanceID] * p;
+	mat4 Mm = modelMat[gl_InstanceID];
+	gl_Position = viewProjectionMat * Mm * p;
 	vecOutColor = vertexColor;
-	myNormal = normal;
-	myPosition = vec3(gl_Position.x, gl_Position.y, gl_Position.z);
+	// normal is a vector so ends with 0
+	myNormal = normalize(vec3(Mm * vec4(normal, 0.0f)));
+	myPosition = vec3(Mm * p);
 }
 
 #shader FRAGMENT

@@ -149,15 +149,16 @@ void MeGlWindow::paintGL()
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
 
-	mat4 Mt = glm::translate(mat4(), vec3(0.0f, 3.0f, 0.0f));
-	//angle += vx;
+	mat4 Mt = glm::translate(mat4(), vec3(0.0f, 0.0f, 0.0f));
 
 	mat4 Mr = glm::rotate(mat4(), angle, vec3(1.0f, 0.0f, 0.0f));
 	mat4 Mproj = glm::perspective(60.0f, ((float)width()) / height(), 0.1f, 100.f);
 	mat4 Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f));
 
+	mat4 Mvp = Mproj * camera.getWorldToViewMatrix();
+
 	mat4 Mx[5];
-	Mx[0] = Mproj * camera.getWorldToViewMatrix();//Mproj * Mt * Mr; //* Mt * Mr
+	Mx[0] = Mt * Ms;
 	vec3 lightPosition(0.0f, 3.0f, 0.0f);
 	vec3 camPosition = camera.getPosition();
 
@@ -166,7 +167,8 @@ void MeGlWindow::paintGL()
 	float intensity = 0.5f;
 	float ambientIntensity = 0.1f;
 	
-	GLint MxUniformLocation = glGetUniformLocation(programID, "transformMat");
+	GLint MxUniformLocation = glGetUniformLocation(programID, "modelMat");
+	GLint MvpUniformLocation = glGetUniformLocation(programID, "viewProjectionMat");
 	GLint lightPositionUniformLoca = glGetUniformLocation(programID, "lightPos");
 	GLint camPosLocation = glGetUniformLocation(programID, "camPos");
 	GLint KaLocation = glGetUniformLocation(programID, "Ka");
@@ -178,6 +180,7 @@ void MeGlWindow::paintGL()
 	glBindVertexArray(planeVertexArrayObjectID);
 	glUseProgram(programID);
 	glUniformMatrix4fv(MxUniformLocation, 5, GL_FALSE, &Mx[0][0][0]);
+	glUniformMatrix4fv(MvpUniformLocation, 1, GL_FALSE, &Mvp[0][0]);
 	glUniform3fv(lightPositionUniformLoca, 1, &lightPosition[0]);
 	glUniform3fv(camPosLocation, 1, &camPosition[0]);
 	glUniform3fv(KaLocation, 1, &ambient[0]);
@@ -191,13 +194,13 @@ void MeGlWindow::paintGL()
 
 	#pragma region calc Matrixs
 	Mt = glm::translate(mat4(), vec3(-3, 3, 2)), Ms = glm::scale(vec3(0.2f, 0.2f, 0.2f));
-	Mx[0] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+	Mx[0] = Mt * Ms;
 
 	Mt = glm::translate(mat4(), vec3(-1, 1, -0.5)), Ms = glm::scale(vec3(0.5f, 0.5f, 0.5f));
-	Mx[1] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+	Mx[1] = Mt * Ms;
 
 	Mt = glm::translate(mat4(), vec3(4, 2, -1)), Ms = glm::scale(vec3(1.2f, 1.2f, 1.2f));
-	Mx[2] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+	Mx[2] = Mt * Ms;
 	#pragma endregion
 	glUniformMatrix4fv(MxUniformLocation, 3, GL_FALSE, &Mx[0][0][0]);
 	glDrawElementsInstanced(GL_TRIANGLES, sphereNumIndices, GL_UNSIGNED_SHORT, (void*)sphereIndexByteOffset, 3);
@@ -206,7 +209,7 @@ void MeGlWindow::paintGL()
 	glBindVertexArray(arrowVertexArrayObjectID);
 	Mt = glm::translate(mat4(), vec3(1, 1, 0.5));
 	Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f));
-	Mx[0] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+	Mx[0] = Mt * Ms;
 	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0][0]);
 	glDrawElements(GL_TRIANGLES, arrowNumIndices, GL_UNSIGNED_SHORT, (void*)arrowIndexByteOffset);
 
@@ -214,7 +217,7 @@ void MeGlWindow::paintGL()
 	glBindVertexArray(cubeVertexArrayObjectID);
 	Mt = glm::translate(mat4(), vec3(5, 1, 3));
 	Ms = glm::scale(vec3(0.6f, 0.6f, 0.6f));
-	Mx[0] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
+	Mx[0] = Mt * Ms;
 	// the only thing changes at the moment is the MVP mat
 	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0][0]);
 	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
@@ -224,9 +227,11 @@ void MeGlWindow::paintGL()
 	glUseProgram(passthroughID);
 	Mt = glm::translate(mat4(), lightPosition);
 	Ms = glm::scale(vec3(0.1f, 0.1f, 0.1f));
-	Mx[0] = Mproj * camera.getWorldToViewMatrix() * Mt * Ms;
-	GLint LightCubeMxUniformLocation = glGetUniformLocation(passthroughID, "modelToProjectionMatrix");
+	Mx[0] = Mt * Ms;
+	GLint LightCubeMxUniformLocation = glGetUniformLocation(passthroughID, "modelMatrix");
+	GLint LightCubeMvpUniformLocation = glGetUniformLocation(passthroughID, "viewProjectionMatrix");
 	glUniformMatrix4fv(LightCubeMxUniformLocation, 1, GL_FALSE, &Mx[0][0][0]);
+	glUniformMatrix4fv(LightCubeMvpUniformLocation, 1, GL_FALSE, &Mvp[0][0]);
 	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
 }
 
