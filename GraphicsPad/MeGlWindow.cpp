@@ -208,20 +208,18 @@ void MeGlWindow::paintGL()
 
 	/// Arrows
 	glBindVertexArray(arrowVertexArrayObjectID);
-	Mt = glm::translate(mat4(), vec3(1, 1, 0.5));
-	Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f));
-	Mx[0] = Mt * Ms;
-	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0][0]);
-	glDrawElements(GL_TRIANGLES, arrowNumIndices, GL_UNSIGNED_SHORT, (void*)arrowIndexByteOffset);
+	Mt = glm::translate(mat4(), vec3(5, 3, -5)), Mr = glm::rotate(90.0f,vec3(1.0f, 0.0f, 0.0f)), Ms = glm::scale(vec3(2.0f, 1.0f, 3.0f)); Mx[0] = Mt * Mr * Ms;
+	Mt = glm::translate(mat4(), vec3(3, 1, 2)), Mr = glm::rotate(30.0f, vec3(0.0f, 1.0f, 0.0f)), Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f)); Mx[1] = Mt * Mr * Ms;
+	glUniformMatrix4fv(MxUniformLocation, 2, GL_FALSE, &Mx[0][0][0]);
+	glDrawElementsInstanced(GL_TRIANGLES, arrowNumIndices, GL_UNSIGNED_SHORT, (void*)arrowIndexByteOffset, 2);
 
 	/// Cube
 	glBindVertexArray(cubeVertexArrayObjectID);
-	Mt = glm::translate(mat4(), vec3(5, 1, 3));
-	Ms = glm::scale(vec3(0.6f, 0.6f, 0.6f));
-	Mx[0] = Mt * Ms;
+	Mt = glm::translate(mat4(), vec3(5, 1, 3)), Mr = glm::rotate(20.0f, vec3(1.0f, 1.0f, 0.0f)), Ms = glm::scale(vec3(0.6f, 0.6f, 0.6f)); Mx[0] = Mt * Mr * Ms;
+	Mt = glm::translate(mat4(), vec3(-3, 0.6, -4)), Mr = glm::rotate(-45.0f, vec3(0.0f, 0.0f, 1.0f)), Ms = glm::scale(vec3(1.0f, 1.0f, 1.0f)); Mx[1] = Mt * Mr * Ms;
 	// the only thing changes at the moment is the MVP mat
-	glUniformMatrix4fv(MxUniformLocation, 1, GL_FALSE, &Mx[0][0][0]);
-	glDrawElements(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset);
+	glUniformMatrix4fv(MxUniformLocation, 2, GL_FALSE, &Mx[0][0][0]);
+	glDrawElementsInstanced(GL_TRIANGLES, cubeNumIndices, GL_UNSIGNED_SHORT, (void*)cubeIndexByteOffset, 2);
 
 	/// light cube
 	glBindVertexArray(cubeVertexArrayObjectID);
