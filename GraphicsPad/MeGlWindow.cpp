@@ -347,26 +347,50 @@ void MeGlWindow::keyPressEvent(QKeyEvent* e)
 	switch (e->key())
 	{
 	case Qt::Key::Key_W:
+		camera.moveForward();
+		//lightPosition = camera.moveVectorForward(lightPosition);
+		break;
+	case Qt::Key::Key_S:
+		camera.moveBackward();
+		//lightPosition = camera.moveVectorBackward(lightPosition);
+		break;
+	case Qt::Key::Key_A:
+		camera.strafeLeft();
+		//lightPosition = camera.moveVectorLeft(lightPosition);
+		break;
+	case Qt::Key::Key_D:
+		camera.strafeRight();
+		//lightPosition = camera.moveVectorRight(lightPosition);
+		break;
+	case Qt::Key::Key_R:
+		camera.moveUp();
+		//lightPosition = camera.moveVectorUp(lightPosition);
+		break;
+	case Qt::Key::Key_F:
+		camera.moveDown();
+		//lightPosition = camera.moveVectorDown(lightPosition);
+		break;
+	case Qt::Key::Key_Up:
 		//camera.moveForward();
 		lightPosition = camera.moveVectorForward(lightPosition);
 		break;
-	case Qt::Key::Key_S:
+	case Qt::Key::Key_Down:
 		//camera.moveBackward();
 		lightPosition = camera.moveVectorBackward(lightPosition);
 		break;
-	case Qt::Key::Key_A:
+	case Qt::Key::Key_Left:
 		//camera.strafeLeft();
 		lightPosition = camera.moveVectorLeft(lightPosition);
 		break;
-	case Qt::Key::Key_D:
+	case Qt::Key::Key_Right:
 		//camera.strafeRight();
 		lightPosition = camera.moveVectorRight(lightPosition);
 		break;
-	case Qt::Key::Key_R:
+	case Qt::Key::Key_1:
 		//camera.moveUp();
 		lightPosition = camera.moveVectorUp(lightPosition);
 		break;
-	case Qt::Key::Key_F:
+	case Qt::Key::Key_2:
 		//camera.moveDown();
 		lightPosition = camera.moveVectorDown(lightPosition);
 		break;
