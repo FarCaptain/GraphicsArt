@@ -37,6 +37,7 @@ uniform vec3 Ka;
 uniform vec3 Ks;
 uniform float Ia;
 uniform float I;
+uniform bool normalMapFlag;
 
 uniform sampler2D Tex;
 uniform sampler2D DaNormalMap;
@@ -54,7 +55,8 @@ void main()
 	vec3 halfVec = normalize(lightVec + camVec);
 
 	vec3 normal = myNormal;
-	normal = texture(DaNormalMap, myTexCoord).xyz * 2.0f - 1.0f;
+	if(normalMapFlag)
+		normal = texture(DaNormalMap, myTexCoord).xyz * 2.0f - 1.0f;
 
 	float r = length(lightVec);
 	float coe = I / (r * r);
